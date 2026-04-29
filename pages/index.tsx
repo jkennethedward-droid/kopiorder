@@ -292,9 +292,6 @@ export default function Home() {
   }
 
   function selectPayment(value: Order["payment"]) {
-    const paymentSpoken =
-      value === "paynow" ? "PayNow" : value === "cash" ? "Cash" : "Card";
-    void speakPreview(paymentSpoken);
     animateAdvance(() => {
       setOrder((o) => ({ ...o, payment: value }));
       setPhase("playback");
@@ -323,38 +320,6 @@ export default function Home() {
     setEditingIndex(null);
     resetFlow();
     setPhase("flow");
-  }
-
-  const previewAudioRef = React.useRef<HTMLAudioElement | null>(null);
-  async function speakPreview(text: string) {
-    try {
-      const res = await fetch("/api/speak", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ text, mode: "sg" }),
-      });
-      if (!res.ok) throw new Error("tts_failed");
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      if (previewAudioRef.current) {
-        previewAudioRef.current.pause();
-        previewAudioRef.current.currentTime = 0;
-      }
-      const audio = new Audio(url);
-      previewAudioRef.current = audio;
-      await audio.play();
-      audio.onended = () => URL.revokeObjectURL(url);
-      audio.onerror = () => URL.revokeObjectURL(url);
-    } catch {
-      try {
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = "en-SG";
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(u);
-      } catch {
-        // silent
-      }
-    }
   }
 
   const screenClass =
@@ -513,6 +478,18 @@ export default function Home() {
                 setPhase("edit");
               }}
               onStartOver={startOver}
+              onSetDrinkQuantity={(idx, nextQty) => {
+                setOrder((o) => {
+                  const drinks = o.drinks.map((d, i) => (i === idx ? { ...d, quantity: nextQty } : d));
+                  return { ...o, drinks };
+                });
+              }}
+              onRemoveDrink={(idx) => {
+                setOrder((o) => {
+                  const drinks = o.drinks.filter((_, i) => i !== idx);
+                  return { ...o, drinks };
+                });
+              }}
             />
           ) : null}
 

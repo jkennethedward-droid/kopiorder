@@ -32,6 +32,7 @@ export default async function handler(req: Request): Promise<Response> {
     method: "POST",
     headers: {
       "content-type": "application/json",
+      accept: "audio/mpeg",
       "xi-api-key": apiKey,
     },
     body: JSON.stringify({
@@ -41,8 +42,46 @@ export default async function handler(req: Request): Promise<Response> {
     }),
   });
 
-  if (!upstream.ok || !upstream.body) {
-    return new Response("TTS failed", { status: 502 });
+  if (!upstream.ok) {
+    let details = "";
+    try {
+      details = await upstream.text();
+    } catch {
+      details = "";
+    }
+    return new Response(
+      JSON.stringify(
+        {
+          error: "TTS upstream failed",
+          upstream_status: upstream.status,
+          upstream_status_text: upstream.statusText,
+          upstream_body: details.slice(0, 2000),
+        },
+        null,
+        2,
+      ),
+      {
+        status: 502,
+        headers: { "content-type": "application/json", "cache-control": "no-store" },
+      },
+    );
+  }
+
+  if (!upstream.body) {
+    return new Response(
+      JSON.stringify(
+        {
+          error: "TTS upstream returned no body",
+          upstream_status: upstream.status,
+        },
+        null,
+        2,
+      ),
+      {
+        status: 502,
+        headers: { "content-type": "application/json", "cache-control": "no-store" },
+      },
+    );
   }
 
   return new Response(upstream.body, {

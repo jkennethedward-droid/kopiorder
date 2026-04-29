@@ -64,8 +64,10 @@ export function DrinkTile(props: {
           <button
             type="button"
             className="qtyBtn"
-            onClick={() => onQuantityChange(Math.max(1, qty - 1))}
-            disabled={qty <= 1}
+            onClick={(e) => {
+              e.stopPropagation();
+              onQuantityChange(Math.max(0, qty - 1));
+            }}
             aria-label="Decrease quantity"
           >
             −
@@ -74,7 +76,10 @@ export function DrinkTile(props: {
           <button
             type="button"
             className="qtyBtn"
-            onClick={() => onQuantityChange(Math.min(5, qty + 1))}
+            onClick={(e) => {
+              e.stopPropagation();
+              onQuantityChange(Math.min(5, qty + 1));
+            }}
             aria-label="Increase quantity"
           >
             +

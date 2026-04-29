@@ -8,11 +8,14 @@ export function OrderPlayback(props: {
   order: Order;
   onEditDrink: (index: number) => void;
   onStartOver: () => void;
+  onSetDrinkQuantity: (index: number, nextQty: number) => void;
+  onRemoveDrink: (index: number) => void;
 }) {
   const [lang, setLang] = React.useState<Language>("sg");
   const [isSpeaking, setIsSpeaking] = React.useState(false);
   const [playingIdx, setPlayingIdx] = React.useState<number | null>(null);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
+  const [confirmRemoveIdx, setConfirmRemoveIdx] = React.useState<number | null>(null);
 
   async function speakText(idx: number, text: string) {
     if (isSpeaking) return;
@@ -64,11 +67,7 @@ export function OrderPlayback(props: {
     <div className="playback">
       <div className="playbackHeader">
         <div className="playbackTopRow">
-          <button type="button" className="brandBtn" onClick={props.onStartOver}>
-            Kopi Order
-          </button>
           <div className="pageTitleCenter">Order</div>
-          <div className="topRowSpacer" aria-hidden="true" />
         </div>
 
         <div className="playbackHint">
@@ -111,10 +110,37 @@ export function OrderPlayback(props: {
               const text = lang === "zh" ? drinkPhraseZH(drink) : drinkPhraseSG(drink);
               void speakText(idx, text);
             }}
+            showStepper
+            onQuantityChange={(next) => {
+              if (next === 0) {
+                setConfirmRemoveIdx(idx);
+                return;
+              }
+              props.onSetDrinkQuantity(idx, next);
+            }}
           />
         ))}
 
-        <PaymentTile payment={props.order.payment} lang={lang} />
+        <PaymentTile
+          payment={props.order.payment}
+          lang={lang}
+          isPlaying={playingIdx === -1}
+          onTileClick={() => {
+            const text =
+              lang === "zh"
+                ? props.order.payment === "paynow"
+                  ? "PayNow付款"
+                  : props.order.payment === "cash"
+                    ? "现金"
+                    : "刷卡"
+                : props.order.payment === "paynow"
+                  ? "PayNow"
+                  : props.order.payment === "cash"
+                    ? "Cash"
+                    : "Card";
+            void speakText(-1, text);
+          }}
+        />
 
         <div className="playbackFooter">
           <div className="broughtBy">Brought to you by Kopi Order</div>
@@ -123,6 +149,30 @@ export function OrderPlayback(props: {
           </button>
         </div>
       </div>
+
+      {confirmRemoveIdx !== null ? (
+        <div className="modalOverlay" role="dialog" aria-modal="true">
+          <div className="modalCard">
+            <div className="modalTitle">Remove this drink?</div>
+            <div className="modalDesc">This will remove it from your order.</div>
+            <div className="modalBtns">
+              <button type="button" className="secondaryBtn" onClick={() => setConfirmRemoveIdx(null)}>
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="primaryBtn"
+                onClick={() => {
+                  props.onRemoveDrink(confirmRemoveIdx);
+                  setConfirmRemoveIdx(null);
+                }}
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
