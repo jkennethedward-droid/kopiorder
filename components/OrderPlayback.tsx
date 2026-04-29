@@ -11,10 +11,13 @@ export function OrderPlayback(props: {
 }) {
   const [lang, setLang] = React.useState<Language>("sg");
   const [isSpeaking, setIsSpeaking] = React.useState(false);
+  const [playingIdx, setPlayingIdx] = React.useState<number | null>(null);
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
 
-  async function speakText(text: string) {
+  async function speakText(idx: number, text: string) {
     if (isSpeaking) return;
     setIsSpeaking(true);
+    setPlayingIdx(idx);
     try {
       const res = await fetch("/api/speak", {
         method: "POST",
@@ -26,33 +29,45 @@ export function OrderPlayback(props: {
 
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
       const audio = new Audio(url);
-      audio.onended = () => URL.revokeObjectURL(url);
+      audioRef.current = audio;
       await audio.play();
+      await new Promise<void>((resolve) => {
+        audio.onended = () => resolve();
+        audio.onerror = () => resolve();
+      });
+      URL.revokeObjectURL(url);
     } catch {
       try {
         const u = new SpeechSynthesisUtterance(text);
         u.lang = lang === "zh" ? "zh-CN" : "en-SG";
         window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(u);
+        await new Promise<void>((resolve) => {
+          u.onend = () => resolve();
+          u.onerror = () => resolve();
+          window.speechSynthesis.speak(u);
+        });
       } catch {
         // silent fallback: nothing else to do
       }
     } finally {
       setIsSpeaking(false);
+      setPlayingIdx(null);
     }
   }
 
   return (
     <div className="playback">
       <div className="playbackHeader">
-        <div className="playbackTopRow">
-          <button type="button" className="brandBtn" onClick={props.onStartOver}>
-            KopiOrder
-          </button>
-          <div className="pageTitleCenter">Order</div>
-          <div className="topRowSpacer" aria-hidden="true" />
-        </div>
+        <button type="button" className="brandBtn" onClick={props.onStartOver}>
+          Kopi Order
+        </button>
+
+        <div className="sectionTitle">Order</div>
 
         <div className="playbackHint">
           Select language and click on title to play your order
@@ -76,7 +91,7 @@ export function OrderPlayback(props: {
               role="tab"
               aria-selected={lang === "zh"}
             >
-              普通话
+              Mandarin
             </button>
           </div>
         </div>
@@ -89,9 +104,10 @@ export function OrderPlayback(props: {
             drink={drink}
             lang={lang}
             onEdit={() => props.onEditDrink(idx)}
+            isPlaying={playingIdx === idx}
             onTitleClick={() => {
               const text = lang === "zh" ? drinkPhraseZH(drink) : drinkPhraseSG(drink);
-              void speakText(text);
+              void speakText(idx, text);
             }}
           />
         ))}

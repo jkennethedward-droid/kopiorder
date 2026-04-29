@@ -13,6 +13,7 @@ export function EditFlow(props: {
   initial: DrinkOption;
   onCancel: () => void;
   onUpdate: (next: DrinkOption) => void;
+  onStartOver?: () => void;
 }) {
   const [draft, setDraft] = React.useState<DrinkOption>(() => normalize(props.initial));
 
@@ -34,10 +35,18 @@ export function EditFlow(props: {
   return (
     <div className="edit">
       <div className="editHeader">
-        <button type="button" className="backBtn" onClick={props.onCancel} aria-label="Back">
-          <ChevronLeft />
-        </button>
-        <div className="editTitle">Edit drink</div>
+        <div className="topLeftRow">
+          <button
+            type="button"
+            className="brandBtn"
+            onClick={props.onStartOver ?? props.onCancel}
+          >
+            Kopi Order
+          </button>
+          <button type="button" className="backBtn" onClick={props.onCancel} aria-label="Back">
+            <ChevronLeft />
+          </button>
+        </div>
       </div>
 
       <div className="editBody">

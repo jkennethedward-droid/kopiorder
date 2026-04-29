@@ -10,6 +10,7 @@ export function DrinkTile(props: {
   showStepper?: boolean;
   showEdit?: boolean;
   onTitleClick?: () => void;
+  isPlaying?: boolean;
 }) {
   const { title, description, formatLine } = getTileText(props.drink, props.lang);
   const qty = props.drink.quantity;
@@ -34,6 +35,14 @@ export function DrinkTile(props: {
       )}
       <div className="tileDesc">{description}</div>
       <div className="tileMeta">{formatLine}</div>
+
+      {props.isPlaying ? (
+        <div className="tileWave" aria-hidden="true">
+          <span className="waveBar" />
+          <span className="waveBar" />
+          <span className="waveBar" />
+        </div>
+      ) : null}
 
       {props.showStepper && onQuantityChange ? (
         <div className="qtyRow">

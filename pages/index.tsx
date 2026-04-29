@@ -113,6 +113,18 @@ function BackChevron(props: { onClick: () => void; disabled?: boolean }) {
   );
 }
 
+function BrandButton(props: { onClick: () => void; center?: boolean }) {
+  return (
+    <button
+      type="button"
+      className={props.center ? "brandBtn brandBtnCenter" : "brandBtn"}
+      onClick={props.onClick}
+    >
+      Kopi Order
+    </button>
+  );
+}
+
 export default function Home() {
   const [phase, setPhase] = React.useState<AppPhase>("flow");
   const [order, setOrder] = React.useState<Order>({ drinks: [], payment: "cash" });
@@ -286,6 +298,11 @@ export default function Home() {
       <div className="appShell">
         <div className="progressTrack">
           <div className="progressFill" style={{ width: `${progress}%` }} />
+          {phase === "flow" && !askingPayment ? (
+            <div className="progressPct" aria-hidden="true">
+              {progress}%
+            </div>
+          ) : null}
         </div>
 
         <div className="appFrame">
@@ -297,7 +314,8 @@ export default function Home() {
                   options={baseDrinkQuestion.options}
                   selected={draft.base}
                   onSelect={selectInFlow}
-                  topLeft={<BackChevron onClick={handleBack} disabled={stepIdx === 0} />}
+                  topCenter={<BrandButton onClick={startOver} center />}
+                  softQuestion
                 />
               ) : null}
 
@@ -307,7 +325,12 @@ export default function Home() {
                   options={milkQuestion.options}
                   selected={draft.milk}
                   onSelect={selectInFlow}
-                  topLeft={<BackChevron onClick={handleBack} />}
+                  topLeft={
+                    <div className="topLeftRow">
+                      <BrandButton onClick={startOver} />
+                      <BackChevron onClick={handleBack} />
+                    </div>
+                  }
                 />
               ) : null}
 
@@ -317,7 +340,12 @@ export default function Home() {
                   options={sugarQuestion.options}
                   selected={draft.sugar}
                   onSelect={selectInFlow}
-                  topLeft={<BackChevron onClick={handleBack} />}
+                  topLeft={
+                    <div className="topLeftRow">
+                      <BrandButton onClick={startOver} />
+                      <BackChevron onClick={handleBack} />
+                    </div>
+                  }
                 />
               ) : null}
 
@@ -327,7 +355,12 @@ export default function Home() {
                   options={strengthQuestion.options}
                   selected={draft.strength}
                   onSelect={selectInFlow}
-                  topLeft={<BackChevron onClick={handleBack} />}
+                  topLeft={
+                    <div className="topLeftRow">
+                      <BrandButton onClick={startOver} />
+                      <BackChevron onClick={handleBack} />
+                    </div>
+                  }
                 />
               ) : null}
 
@@ -337,7 +370,12 @@ export default function Home() {
                   options={temperatureQuestion.options}
                   selected={draft.temperature}
                   onSelect={selectInFlow}
-                  topLeft={<BackChevron onClick={handleBack} />}
+                  topLeft={
+                    <div className="topLeftRow">
+                      <BrandButton onClick={startOver} />
+                      <BackChevron onClick={handleBack} />
+                    </div>
+                  }
                 />
               ) : null}
 
@@ -347,7 +385,12 @@ export default function Home() {
                   options={formatQuestion.options}
                   selected={draft.format}
                   onSelect={selectInFlow}
-                  topLeft={<BackChevron onClick={handleBack} />}
+                  topLeft={
+                    <div className="topLeftRow">
+                      <BrandButton onClick={startOver} />
+                      <BackChevron onClick={handleBack} />
+                    </div>
+                  }
                 />
               ) : null}
 
@@ -357,7 +400,12 @@ export default function Home() {
                   options={paymentQuestion.options}
                   selected={order.payment}
                   onSelect={selectPayment}
-                  topLeft={<BackChevron onClick={handleBack} />}
+                  topLeft={
+                    <div className="topLeftRow">
+                      <BrandButton onClick={startOver} />
+                      <BackChevron onClick={handleBack} />
+                    </div>
+                  }
                 />
               ) : null}
             </div>
@@ -365,6 +413,7 @@ export default function Home() {
 
           {phase === "interim" && interimIndex !== null ? (
             <div className="interim">
+              <BrandButton onClick={startOver} />
               <div className="interimTitle">Your drink</div>
               <DrinkTile
                 drink={order.drinks[interimIndex]}
@@ -417,6 +466,7 @@ export default function Home() {
                 setEditingIndex(null);
                 setPhase("playback");
               }}
+              onStartOver={startOver}
               onUpdate={(next) => {
                 setOrder((o) => {
                   const drinks = o.drinks.map((d, i) => (i === editingIndex ? next : d));

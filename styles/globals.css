@@ -48,22 +48,36 @@ button {
 }
 
 .progressTrack {
-  height: 3px;
+  position: relative;
+  height: 5px;
   width: 100%;
   background: #171512;
 }
 
 .progressFill {
-  height: 3px;
+  height: 5px;
   background: var(--accent);
   width: 0%;
   transition: width 320ms ease;
 }
 
+.progressPct {
+  position: absolute;
+  right: 10px;
+  top: 0;
+  height: 5px;
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  color: rgba(242, 237, 228, 0.85);
+  letter-spacing: 0.2px;
+  mix-blend-mode: normal;
+}
+
 .appFrame {
   width: 100%;
   max-width: 390px;
-  height: calc(100dvh - 3px);
+  height: calc(100dvh - 5px);
   display: flex;
   flex-direction: column;
 }
@@ -103,9 +117,32 @@ button {
   align-items: center;
 }
 
-.stepTopLeft {
+.stepTopGrid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.stepTopLeft,
+.stepTopCenter,
+.stepTopRight {
   display: flex;
   align-items: center;
+}
+
+.stepTopCenter {
+  justify-content: center;
+}
+
+.stepTopRight {
+  justify-content: flex-end;
+}
+
+.topLeftRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .backBtn {
@@ -140,6 +177,12 @@ button {
   margin: 0 0 18px;
 }
 
+.stepQuestion.isSoft {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 20px;
+  color: rgba(242, 237, 228, 0.92);
+}
 .optionList,
 .editOptions {
   display: flex;
@@ -309,6 +352,10 @@ button {
   cursor: pointer;
 }
 
+.tileTitleBtn .tileTitle {
+  display: block;
+}
+
 .tileTitleBtn:active {
   opacity: 0.85;
 }
@@ -327,6 +374,43 @@ button {
   color: var(--text);
 }
 
+.tileWave {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 4px;
+  opacity: 0.9;
+}
+
+.waveBar {
+  width: 3px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(232, 160, 32, 0.85);
+  animation: wave 900ms ease-in-out infinite;
+}
+
+.waveBar:nth-child(2) {
+  animation-delay: 120ms;
+  height: 12px;
+}
+
+.waveBar:nth-child(3) {
+  animation-delay: 240ms;
+  height: 10px;
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: scaleY(0.55);
+  }
+  50% {
+    transform: scaleY(1.2);
+  }
+}
 .qtyRow {
   margin-top: 14px;
   display: flex;
@@ -384,6 +468,20 @@ button {
   font-weight: 800;
   font-size: 22px;
   padding: 0;
+}
+
+.brandBtnCenter {
+  font-size: 26px;
+  justify-self: center;
+}
+
+.sectionTitle {
+  margin-top: 10px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 16px;
+  text-align: center;
+  color: rgba(242, 237, 228, 0.9);
 }
 
 .pageTitleCenter {
