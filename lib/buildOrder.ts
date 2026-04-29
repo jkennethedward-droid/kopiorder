@@ -105,23 +105,6 @@ export function descriptionSG(drink: DrinkOption): string {
   return parts.join(", ");
 }
 
-export function formatLineSG(drink: DrinkOption): string {
-  if (drink.format === "dinein") return "Dine in";
-  return "Dabao";
-}
-
-export function paymentLabelSG(payment: Order["payment"]): string {
-  if (payment === "paynow") return "PayNow";
-  if (payment === "cash") return "Cash";
-  return "Card";
-}
-
-export function paymentSentenceSG(payment: Order["payment"]): string {
-  if (payment === "paynow") return "PayNow.";
-  if (payment === "cash") return "Cash.";
-  return "Card can.";
-}
-
 export function drinkPhraseSG(drink: DrinkOption): string {
   const qty = numberWords[drink.quantity] ?? String(drink.quantity);
   const baseRaw = kopiNameSG(drink);
@@ -131,11 +114,8 @@ export function drinkPhraseSG(drink: DrinkOption): string {
     .trim()
     .toLowerCase();
 
-  const where =
-    drink.format === "dinein" ? "dine in" : "dabao";
-
   // Speak in clear blocks with short pauses.
-  const tokens = [`${qty}`, ...base.split(/\s+/).filter(Boolean), ...where.split(/\s+/)].filter(Boolean);
+  const tokens = [`${qty}`, ...base.split(/\s+/).filter(Boolean)].filter(Boolean);
   const blocks = tokens.flatMap((t) => pronounceSGToken(t));
 
   // IMPORTANT: Do not use bracketed pause tags. Some voices read them aloud.
@@ -164,22 +144,11 @@ function pronounceSGToken(token: string): string[] {
   if (t === "paynow") return ["pay", "now"];
   if (t === "cash") return ["cash"];
   if (t === "card") return ["card"];
-  if (t === "dine") return ["dine"];
-  if (t === "in") return ["in"];
   return [token];
 }
 
 export function buildSGSentence(order: Order): string {
-  const dabao: DrinkOption[] = [];
-  const dinein: DrinkOption[] = [];
-  for (const d of order.drinks) {
-    if (d.format === "dabao") dabao.push(d);
-    else dinein.push(d);
-  }
-
-  const chunks: string[] = [];
-  if (dabao.length > 0) chunks.push(...dabao.map(drinkPhraseSG));
-  if (dinein.length > 0) chunks.push(...dinein.map(drinkPhraseSG));
+  const chunks: string[] = order.drinks.map(drinkPhraseSG);
 
   const joined =
     chunks.length === 0
@@ -188,12 +157,7 @@ export function buildSGSentence(order: Order): string {
         ? chunks[0]
         : `${chunks.slice(0, -1).join(", ")}, and ${chunks[chunks.length - 1]}`;
 
-  const pay = paymentSentenceSG(order.payment);
-
-  return `Excuse me, ${joined}. ${pay} Thank you.`
-    .replace(/\s+/g, " ")
-    .replace(/\.\s+\./g, ".")
-    .trim();
+  return `Excuse me, ${joined}. Thank you.`.replace(/\s+/g, " ").trim();
 }
 
 export function kopiNameZH(drink: DrinkOption): string {
@@ -297,23 +261,10 @@ export function descriptionZH(drink: DrinkOption): string {
   return parts.join("，");
 }
 
-export function formatLineZH(drink: DrinkOption): string {
-  if (drink.format === "dinein") return "堂食";
-  return "打包";
-}
-
-export function paymentLabelZH(payment: Order["payment"]): string {
-  if (payment === "paynow") return "PayNow付款";
-  if (payment === "cash") return "现金";
-  return "刷卡";
-}
-
 export function drinkPhraseZH(drink: DrinkOption): string {
   const qty = zhNumerals[drink.quantity] ?? String(drink.quantity);
   const name = kopiNameZH(drink);
-  const where =
-    drink.format === "dinein" ? "堂食" : "打包";
-  return `${qty}杯${name}${where}`;
+  return `${qty}杯${name}`;
 }
 
 export function buildMandarinSentence(order: Order): string {
@@ -325,8 +276,7 @@ export function buildMandarinSentence(order: Order): string {
         ? phrases[0]
         : `${phrases.slice(0, -1).join("，")}，还有${phrases[phrases.length - 1]}`;
 
-  const pay = paymentLabelZH(order.payment);
-  return `我要${joined}。${pay}。谢谢。`.replace(/\s+/g, " ").trim();
+  return `我要${joined}。谢谢。`.replace(/\s+/g, " ").trim();
 }
 
 export function getTileText(drink: DrinkOption, lang: Language): {
@@ -335,7 +285,7 @@ export function getTileText(drink: DrinkOption, lang: Language): {
   formatLine: string;
 } {
   return lang === "zh"
-    ? { title: kopiNameZH(drink), description: descriptionZH(drink), formatLine: formatLineZH(drink) }
-    : { title: kopiNameSG(drink), description: descriptionSG(drink), formatLine: formatLineSG(drink) };
+    ? { title: kopiNameZH(drink), description: descriptionZH(drink), formatLine: "" }
+    : { title: kopiNameSG(drink), description: descriptionSG(drink), formatLine: "" };
 }
 

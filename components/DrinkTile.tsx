@@ -49,7 +49,7 @@ export function DrinkTile(props: {
 
       <div className="tileTitle">{title}</div>
       <div className="tileDesc">{description}</div>
-      <div className="tileMeta">{formatLine}</div>
+      {formatLine ? <div className="tileMeta">{formatLine}</div> : null}
 
       {props.isPlaying ? (
         <div className="tileWave" aria-hidden="true">

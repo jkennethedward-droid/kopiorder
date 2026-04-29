@@ -6,9 +6,7 @@ import { OrderPlayback } from "../components/OrderPlayback";
 import { QuestionStep } from "../components/QuestionStep";
 import {
   baseDrinkQuestion,
-  formatQuestion,
   milkQuestion,
-  paymentQuestion,
   strengthQuestion,
   sugarQuestion,
   temperatureQuestion,
@@ -16,7 +14,6 @@ import {
 import type {
   AppPhase,
   BaseDrink,
-  DrinkFormat,
   DrinkOption,
   MilkType,
   Order,
@@ -32,7 +29,6 @@ type DraftDrink = {
   sugar: SugarLevel | null;
   strength: StrengthLevel | null;
   temperature: Temperature | null;
-  format: DrinkFormat | null;
   vessel: null;
 };
 
@@ -45,7 +41,6 @@ const emptyDraft: DraftDrink = {
   sugar: null,
   strength: null,
   temperature: null,
-  format: null,
   vessel: null,
 };
 
@@ -59,7 +54,6 @@ function stepsForDraft(d: DraftDrink): StepKey[] {
   steps.push("sugar");
   if (!isSpecialBase(d.base)) steps.push("strength");
   steps.push("temperature");
-  steps.push("format");
   return steps;
 }
 
@@ -69,7 +63,6 @@ function canFinalize(d: DraftDrink): boolean {
   if (!d.sugar) return false;
   if (!isSpecialBase(d.base) && !d.strength) return false;
   if (!d.temperature) return false;
-  if (!d.format) return false;
   return true;
 }
 
@@ -85,7 +78,6 @@ function finalizeDraft(d: DraftDrink): DrinkOption {
     sugar: d.sugar ?? "normal",
     strength: special ? null : (d.strength ?? "normal"),
     temperature: d.temperature ?? "hot",
-    format: d.format ?? "dinein",
     vessel: null,
     quantity: 1,
   };
@@ -158,13 +150,12 @@ function draftOrderPreview(d: DraftDrink): string {
   }
 
   if (d.temperature === "peng") tokens.push("Peng");
-  if (d.format === "dabao") tokens.push("Dabao");
   return tokens.join(" ");
 }
 
 export default function Home() {
   const [phase, setPhase] = React.useState<AppPhase>("flow");
-  const [order, setOrder] = React.useState<Order>({ drinks: [], payment: "cash" });
+  const [order, setOrder] = React.useState<Order>({ drinks: [] });
 
   const [draft, setDraft] = React.useState<DraftDrink>(emptyDraft);
   const [stepIdx, setStepIdx] = React.useState(0);
@@ -174,22 +165,18 @@ export default function Home() {
   const [interimIndex, setInterimIndex] = React.useState<number | null>(null);
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
 
-  const [askingPayment, setAskingPayment] = React.useState(false);
-
   const steps = React.useMemo(() => stepsForDraft(draft), [draft]);
-  const currentKey = askingPayment ? "payment" : steps[Math.min(stepIdx, steps.length - 1)];
+  const currentKey = steps[Math.min(stepIdx, steps.length - 1)];
 
   const progress = React.useMemo(() => {
-    if (askingPayment) return 100;
     if (steps.length === 0) return 0;
     const done = Math.max(0, Math.min(stepIdx, steps.length - 1));
     return Math.round((done / Math.max(steps.length - 1, 1)) * 100);
-  }, [askingPayment, stepIdx, steps.length]);
+  }, [stepIdx, steps.length]);
 
   function resetFlow() {
     setDraft(emptyDraft);
     setStepIdx(0);
-    setAskingPayment(false);
     setMaxMsg(null);
     setAnim("idle");
   }
@@ -200,12 +187,6 @@ export default function Home() {
   }
 
   function handleBack() {
-    if (askingPayment) {
-      setAskingPayment(false);
-      setPhase("interim");
-      return;
-    }
-
     if (stepIdx <= 0) return;
     const keyToClear = steps[stepIdx];
     setDraft((d) => {
@@ -215,9 +196,6 @@ export default function Home() {
       if (keyToClear === "sugar") next.sugar = null;
       if (keyToClear === "strength") next.strength = null;
       if (keyToClear === "temperature") next.temperature = null;
-      if (keyToClear === "format") {
-        next.format = null;
-      }
       return next;
     });
     setStepIdx((i) => Math.max(0, i - 1));
@@ -274,12 +252,9 @@ export default function Home() {
           next.strength = value as StrengthLevel;
         } else if (currentKey === "temperature") {
           next.temperature = value as Temperature;
-        } else if (currentKey === "format") {
-          next.format = value as DrinkFormat;
         }
         if (!next.sugar) next.sugar = "normal";
         if (!next.temperature) next.temperature = "hot";
-        if (!next.format) next.format = "dinein";
         if (!isSpecialBase(next.base)) {
           if (!next.milk) next.milk = "default";
           if (!next.strength) next.strength = "normal";
@@ -291,22 +266,6 @@ export default function Home() {
     });
   }
 
-  function selectPayment(value: Order["payment"]) {
-    animateAdvance(() => {
-      setOrder((o) => ({ ...o, payment: value }));
-      setPhase("playback");
-      setAskingPayment(false);
-    });
-  }
-
-  function startPayment() {
-    setMaxMsg(null);
-    setAskingPayment(true);
-    setPhase("flow");
-    setStepIdx(0);
-    setDraft(emptyDraft);
-  }
-
   function updateQuantity(index: number, nextQty: number) {
     setOrder((o) => {
       const drinks = o.drinks.map((d, i) => (i === index ? { ...d, quantity: nextQty } : d));
@@ -315,7 +274,7 @@ export default function Home() {
   }
 
   function startOver() {
-    setOrder({ drinks: [], payment: "cash" });
+    setOrder({ drinks: [] });
     setInterimIndex(null);
     setEditingIndex(null);
     resetFlow();
@@ -338,7 +297,7 @@ export default function Home() {
         <div className="progressTrack">
           <div className="progressFill" style={{ width: `${progress}%` }} />
         </div>
-        {phase === "flow" && !askingPayment ? (
+        {phase === "flow" ? (
           <div className="progressPctRow" aria-hidden="true">
             {progress}%
           </div>
@@ -347,7 +306,7 @@ export default function Home() {
         <div className="appFrame">
           {phase === "flow" ? (
             <div className={screenClass}>
-              {!askingPayment && currentKey === "base" ? (
+              {currentKey === "base" ? (
                 <QuestionStep
                   question={baseDrinkQuestion.question}
                   options={baseDrinkQuestion.options}
@@ -359,7 +318,7 @@ export default function Home() {
                 />
               ) : null}
 
-              {!askingPayment && currentKey === "milk" ? (
+              {currentKey === "milk" ? (
                 <QuestionStep
                   question={milkQuestion.question}
                   options={milkQuestion.options}
@@ -371,7 +330,7 @@ export default function Home() {
                 />
               ) : null}
 
-              {!askingPayment && currentKey === "sugar" ? (
+              {currentKey === "sugar" ? (
                 <QuestionStep
                   question={sugarQuestion.question}
                   options={sugarQuestion.options}
@@ -383,7 +342,7 @@ export default function Home() {
                 />
               ) : null}
 
-              {!askingPayment && currentKey === "strength" ? (
+              {currentKey === "strength" ? (
                 <QuestionStep
                   question={strengthQuestion.question}
                   options={strengthQuestion.options}
@@ -395,7 +354,7 @@ export default function Home() {
                 />
               ) : null}
 
-              {!askingPayment && currentKey === "temperature" ? (
+              {currentKey === "temperature" ? (
                 <QuestionStep
                   question={temperatureQuestion.question}
                   options={temperatureQuestion.options}
@@ -407,29 +366,6 @@ export default function Home() {
                 />
               ) : null}
 
-              {!askingPayment && currentKey === "format" ? (
-                <QuestionStep
-                  question={formatQuestion.question}
-                  options={formatQuestion.options}
-                  selected={draft.format}
-                  onSelect={selectInFlow}
-                  topLeft={<BrandButton onClick={startOver} />}
-                  footer={<BackChevron onClick={handleBack} />}
-                  orderPreview={orderPreview}
-                />
-              ) : null}
-
-              {askingPayment ? (
-                <QuestionStep
-                  question={paymentQuestion.question}
-                  options={paymentQuestion.options}
-                  selected={order.payment}
-                  onSelect={selectPayment}
-                  topLeft={<BrandButton onClick={startOver} />}
-                  footer={<BackChevron onClick={handleBack} />}
-                  orderPreview={orderPreview}
-                />
-              ) : null}
             </div>
           ) : null}
 
@@ -463,8 +399,8 @@ export default function Home() {
                   Add another drink
                 </button>
 
-                <button type="button" className="primaryBtn" onClick={startPayment}>
-                  Payment options
+                <button type="button" className="primaryBtn" onClick={() => setPhase("playback")}>
+                  View order
                 </button>
               </div>
             </div>

@@ -2,7 +2,6 @@ import * as React from "react";
 import type { DrinkOption } from "../lib/types";
 import {
   baseDrinkQuestion,
-  formatQuestion,
   milkQuestion,
   strengthQuestion,
   sugarQuestion,
@@ -135,23 +134,6 @@ export function EditFlow(props: {
                 type="button"
                 className={`optionCard ${draft.temperature === o.value ? "isSelected" : ""}`}
                 onClick={() => update({ ...draft, temperature: o.value })}
-              >
-                <div className="optionLabel">{o.label}</div>
-                <div className="optionDesc">{o.description}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="editSection">
-          {sectionTitle(6, formatQuestion.question)}
-          <div className="editOptions">
-            {formatQuestion.options.map((o) => (
-              <button
-                key={o.value}
-                type="button"
-                className={`optionCard ${draft.format === o.value ? "isSelected" : ""}`}
-                onClick={() => update({ ...draft, format: o.value })}
               >
                 <div className="optionLabel">{o.label}</div>
                 <div className="optionDesc">{o.description}</div>

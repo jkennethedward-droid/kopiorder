@@ -2,7 +2,6 @@ import * as React from "react";
 import type { Language, Order } from "../lib/types";
 import { drinkPhraseSG, drinkPhraseZH } from "../lib/buildOrder";
 import { DrinkTile } from "./DrinkTile";
-import { PaymentTile } from "./PaymentTile";
 
 export function OrderPlayback(props: {
   order: Order;
@@ -120,27 +119,6 @@ export function OrderPlayback(props: {
             }}
           />
         ))}
-
-        <PaymentTile
-          payment={props.order.payment}
-          lang={lang}
-          isPlaying={playingIdx === -1}
-          onTileClick={() => {
-            const text =
-              lang === "zh"
-                ? props.order.payment === "paynow"
-                  ? "PayNow付款"
-                  : props.order.payment === "cash"
-                    ? "现金"
-                    : "刷卡"
-                : props.order.payment === "paynow"
-                  ? "PayNow"
-                  : props.order.payment === "cash"
-                    ? "Cash"
-                    : "Card";
-            void speakText(-1, text);
-          }}
-        />
 
         <div className="playbackFooter">
           <div className="broughtBy">Brought to you by Kopi Order</div>

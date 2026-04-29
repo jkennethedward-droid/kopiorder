@@ -1,6 +1,5 @@
 import type {
   BaseDrink,
-  DrinkFormat,
   MilkType,
   StepKey,
   StrengthLevel,
@@ -13,11 +12,7 @@ export type OptionValue =
   | MilkType
   | SugarLevel
   | StrengthLevel
-  | Temperature
-  | DrinkFormat
-  | "cash"
-  | "paynow"
-  | "card";
+  | Temperature;
 
 export interface QuestionOption<T extends OptionValue> {
   value: T;
@@ -144,32 +139,11 @@ export const temperatureQuestion: QuestionDef<Temperature> = {
   ],
 };
 
-export const formatQuestion: QuestionDef<DrinkFormat> = {
-  key: "format",
-  question: "Eating here?",
-  options: [
-    { value: "dinein", label: "Dine in", description: "Served in a cup or glass at the stall." },
-    { value: "dabao", label: "Dabao", description: "Packed to go. Taking it away." },
-  ],
-};
-
-export const paymentQuestion: QuestionDef<"cash" | "paynow" | "card"> = {
-  key: "payment",
-  question: "How are you paying?",
-  options: [
-    { value: "cash", label: "Cash", description: "Most kopitiams prefer this. Have change ready if you can." },
-    { value: "paynow", label: "PayNow", description: "Scan the QR at the stall. Fast and contactless." },
-    { value: "card", label: "Card", description: "Not all stalls accept. Check before you order." },
-  ],
-};
-
 export const questionsByKey: Record<StepKey, QuestionDef<OptionValue>> = {
   base: baseDrinkQuestion,
   milk: milkQuestion,
   sugar: sugarQuestion,
   strength: strengthQuestion,
   temperature: temperatureQuestion,
-  format: formatQuestion,
-  payment: paymentQuestion,
 };
 
