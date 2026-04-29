@@ -320,15 +320,17 @@ export default function Home() {
           {phase === "home" ? (
             <div className={screenClass}>
               <div className="homeScreen">
-                <div className="homeCenter">
-                  <div className="homeTitle">KopiOrder</div>
-                  <div className="homeSubtitle">Order kopi in 3 simple steps</div>
-                  <div className="homeHint">Pick your drink · We craft the order · Press play</div>
-                </div>
+                <div className="homeBlock">
+                  <div className="homeCenter">
+                    <div className="homeTitle">KopiOrder</div>
+                    <div className="homeSubtitle">Order kopi in 3 simple steps</div>
+                    <div className="homeHint">Pick your drink · We craft the order · Press play</div>
+                  </div>
 
-                <button type="button" className="primaryBtn homeCta" onClick={startFromHome}>
-                  Start my order
-                </button>
+                  <button type="button" className="primaryBtn homeCta" onClick={startFromHome}>
+                    Start my order
+                  </button>
+                </div>
               </div>
             </div>
           ) : null}
