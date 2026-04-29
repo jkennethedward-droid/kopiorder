@@ -18,7 +18,7 @@ export interface Order {
   drinks: DrinkOption[];
 }
 
-export type AppPhase = "flow" | "interim" | "playback" | "edit";
+export type AppPhase = "home" | "flow" | "interim" | "playback" | "edit";
 export type Language = "sg" | "zh";
 
 export type StepKey =

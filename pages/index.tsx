@@ -154,7 +154,7 @@ function draftOrderPreview(d: DraftDrink): string {
 }
 
 export default function Home() {
-  const [phase, setPhase] = React.useState<AppPhase>("flow");
+  const [phase, setPhase] = React.useState<AppPhase>("home");
   const [order, setOrder] = React.useState<Order>({ drinks: [] });
 
   const [draft, setDraft] = React.useState<DraftDrink>(emptyDraft);
@@ -184,6 +184,16 @@ export default function Home() {
   function startNewDrink() {
     resetFlow();
     setPhase("flow");
+  }
+
+  function startFromHome() {
+    animateAdvance(() => {
+      resetFlow();
+      setOrder({ drinks: [] });
+      setInterimIndex(null);
+      setEditingIndex(null);
+      setPhase("flow");
+    });
   }
 
   function handleBack() {
@@ -294,9 +304,12 @@ export default function Home() {
       </Head>
 
       <div className="appShell">
-        <div className="progressTrack">
-          <div className="progressFill" style={{ width: `${progress}%` }} />
-        </div>
+        {phase !== "home" ? (
+          <div className="progressTrack">
+            <div className="progressFill" style={{ width: `${progress}%` }} />
+          </div>
+        ) : null}
+
         {phase === "flow" ? (
           <div className="progressPctRow" aria-hidden="true">
             {progress}%
@@ -304,6 +317,22 @@ export default function Home() {
         ) : null}
 
         <div className="appFrame">
+          {phase === "home" ? (
+            <div className={screenClass}>
+              <div className="homeScreen">
+                <div className="homeCenter">
+                  <div className="homeTitle">KopiOrder</div>
+                  <div className="homeSubtitle">Order kopi in 3 simple steps</div>
+                  <div className="homeHint">Pick your drink · We craft the order · Press play</div>
+                </div>
+
+                <button type="button" className="primaryBtn homeCta" onClick={startFromHome}>
+                  Start my order
+                </button>
+              </div>
+            </div>
+          ) : null}
+
           {phase === "flow" ? (
             <div className={screenClass}>
               {currentKey === "base" ? (
