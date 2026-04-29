@@ -6,7 +6,6 @@ import type {
   StrengthLevel,
   SugarLevel,
   Temperature,
-  Vessel,
 } from "./types";
 
 export type OptionValue =
@@ -16,7 +15,6 @@ export type OptionValue =
   | StrengthLevel
   | Temperature
   | DrinkFormat
-  | Vessel
   | "cash"
   | "paynow"
   | "card";
@@ -155,15 +153,6 @@ export const formatQuestion: QuestionDef<DrinkFormat> = {
   ],
 };
 
-export const vesselQuestion: QuestionDef<Vessel> = {
-  key: "vessel",
-  question: "Bag or cup?",
-  options: [
-    { value: "bag", label: "Bag", description: "Classic tied plastic bag with a straw. Old school Singapore." },
-    { value: "cup", label: "Cup", description: "Plastic cup with lid. Easier to carry." },
-  ],
-};
-
 export const paymentQuestion: QuestionDef<"cash" | "paynow" | "card"> = {
   key: "payment",
   question: "How are you paying?",
@@ -181,7 +170,6 @@ export const questionsByKey: Record<StepKey, QuestionDef<OptionValue>> = {
   strength: strengthQuestion,
   temperature: temperatureQuestion,
   format: formatQuestion,
-  vessel: vesselQuestion,
   payment: paymentQuestion,
 };
 

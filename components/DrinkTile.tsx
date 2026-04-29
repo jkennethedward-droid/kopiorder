@@ -9,6 +9,7 @@ export function DrinkTile(props: {
   onQuantityChange?: (next: number) => void;
   showStepper?: boolean;
   showEdit?: boolean;
+  onTitleClick?: () => void;
 }) {
   const { title, description, formatLine } = getTileText(props.drink, props.lang);
   const qty = props.drink.quantity;
@@ -24,7 +25,13 @@ export function DrinkTile(props: {
         </button>
       )}
 
-      <div className="tileTitle">{title}</div>
+      {props.onTitleClick ? (
+        <button type="button" className="tileTitleBtn" onClick={props.onTitleClick}>
+          <span className="tileTitle">{title}</span>
+        </button>
+      ) : (
+        <div className="tileTitle">{title}</div>
+      )}
       <div className="tileDesc">{description}</div>
       <div className="tileMeta">{formatLine}</div>
 

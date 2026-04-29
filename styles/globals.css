@@ -299,6 +299,20 @@ button {
   color: var(--accent);
 }
 
+.tileTitleBtn {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tileTitleBtn:active {
+  opacity: 0.85;
+}
+
 .tileDesc {
   margin-top: 6px;
   font-size: 13px;
@@ -354,11 +368,43 @@ button {
   padding: 18px 14px 0;
 }
 
-.greeting {
+.playbackTopRow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding-top: 8px;
+}
+
+.brandBtn {
+  justify-self: start;
+  background: transparent;
+  border: none;
+  color: var(--text);
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 28px;
-  padding-top: 10px;
+  font-size: 22px;
+  padding: 0;
+}
+
+.pageTitleCenter {
+  justify-self: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.topRowSpacer {
+  justify-self: end;
+  width: 1px;
+  height: 1px;
+}
+
+.playbackHint {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.35;
 }
 
 .toggleSticky {

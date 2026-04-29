@@ -1,5 +1,4 @@
 import type { DrinkOption, Language, Order } from "./types";
-import { getSGTGreeting } from "./time";
 
 const numberWords: Record<number, string> = {
   1: "one",
@@ -108,7 +107,7 @@ export function descriptionSG(drink: DrinkOption): string {
 
 export function formatLineSG(drink: DrinkOption): string {
   if (drink.format === "dinein") return "Dine in";
-  return `Dabao, ${drink.vessel === "bag" ? "bag" : "cup"}`;
+  return "Dabao";
 }
 
 export function paymentLabelSG(payment: Order["payment"]): string {
@@ -123,21 +122,17 @@ export function paymentSentenceSG(payment: Order["payment"]): string {
   return "Card can.";
 }
 
-function drinkPhraseSG(drink: DrinkOption): string {
+export function drinkPhraseSG(drink: DrinkOption): string {
   const qty = numberWords[drink.quantity] ?? String(drink.quantity);
   const base = kopiNameSG(drink).toLowerCase();
 
   const where =
-    drink.format === "dinein"
-      ? "dine in"
-      : `dabao ${drink.vessel === "bag" ? "bag" : "cup"}`;
+    drink.format === "dinein" ? "dine in" : "dabao";
 
   return `${qty} ${base} ${where}`.replace(/\s+/g, " ").trim();
 }
 
 export function buildSGSentence(order: Order): string {
-  const greeting = getSGTGreeting("sg");
-
   const dabao: DrinkOption[] = [];
   const dinein: DrinkOption[] = [];
   for (const d of order.drinks) {
@@ -158,7 +153,7 @@ export function buildSGSentence(order: Order): string {
 
   const pay = paymentSentenceSG(order.payment);
 
-  return `${greeting}, excuse me, ${joined}. ${pay} Thank you.`
+  return `Excuse me, ${joined}. ${pay} Thank you.`
     .replace(/\s+/g, " ")
     .replace(/\.\s+\./g, ".")
     .trim();
@@ -267,7 +262,7 @@ export function descriptionZH(drink: DrinkOption): string {
 
 export function formatLineZH(drink: DrinkOption): string {
   if (drink.format === "dinein") return "堂食";
-  return `打包，${drink.vessel === "bag" ? "袋装" : "杯装"}`;
+  return "打包";
 }
 
 export function paymentLabelZH(payment: Order["payment"]): string {
@@ -276,19 +271,15 @@ export function paymentLabelZH(payment: Order["payment"]): string {
   return "刷卡";
 }
 
-function drinkPhraseZH(drink: DrinkOption): string {
+export function drinkPhraseZH(drink: DrinkOption): string {
   const qty = zhNumerals[drink.quantity] ?? String(drink.quantity);
   const name = kopiNameZH(drink);
   const where =
-    drink.format === "dinein"
-      ? "堂食"
-      : `打包${drink.vessel === "bag" ? "袋装" : "杯装"}`;
+    drink.format === "dinein" ? "堂食" : "打包";
   return `${qty}杯${name}${where}`;
 }
 
 export function buildMandarinSentence(order: Order): string {
-  const greeting = getSGTGreeting("zh");
-
   const phrases = order.drinks.map(drinkPhraseZH);
   const joined =
     phrases.length === 0
@@ -298,7 +289,7 @@ export function buildMandarinSentence(order: Order): string {
         : `${phrases.slice(0, -1).join("，")}，还有${phrases[phrases.length - 1]}`;
 
   const pay = paymentLabelZH(order.payment);
-  return `${greeting}，我要${joined}。${pay}。谢谢。`.replace(/\s+/g, " ").trim();
+  return `我要${joined}。${pay}。谢谢。`.replace(/\s+/g, " ").trim();
 }
 
 export function getTileText(drink: DrinkOption, lang: Language): {

@@ -2,10 +2,8 @@ export const config = {
   runtime: "edge",
 };
 
-const SG_VOICE_ID = "M0TrFmFeBJS9H4xzdk8Z"; // Steven Gor, Chinese Singaporean Accent
-// Note: ElevenLabs voice IDs vary per account/library. If this voice is unavailable,
-// ElevenLabs will return an error and the client will silently fall back to Web Speech.
-const ZH_VOICE_ID = "21m00Tcm4TlvDq8ikWAM";
+const SG_VOICE_ID = "FXMPPfJPpDj0GSwJ6ASO";
+const ZH_VOICE_ID = "vZZLclMx4wouUtKBRfZn";
 
 type Body = { text?: string; mode?: "sg" | "zh" };
 

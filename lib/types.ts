@@ -4,7 +4,6 @@ export type SugarLevel = "normal" | "siudai" | "kosong" | "gahdai";
 export type StrengthLevel = "normal" | "gau" | "poh";
 export type Temperature = "hot" | "peng";
 export type DrinkFormat = "dinein" | "dabao";
-export type Vessel = "bag" | "cup";
 
 export interface DrinkOption {
   base: BaseDrink;
@@ -13,7 +12,7 @@ export interface DrinkOption {
   strength: StrengthLevel | null;
   temperature: Temperature;
   format: DrinkFormat;
-  vessel: Vessel | null;
+  vessel: null;
   quantity: number;
 }
 
@@ -32,7 +31,6 @@ export type StepKey =
   | "strength"
   | "temperature"
   | "format"
-  | "vessel"
   | "payment";
 
 export type SpeakMode = Language;

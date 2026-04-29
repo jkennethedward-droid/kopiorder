@@ -7,7 +7,6 @@ import {
   strengthQuestion,
   sugarQuestion,
   temperatureQuestion,
-  vesselQuestion,
 } from "../lib/questions";
 
 export function EditFlow(props: {
@@ -152,27 +151,6 @@ export function EditFlow(props: {
           </div>
         </div>
 
-        <div className="editSection">
-          {sectionTitle(7, vesselQuestion.question)}
-          {draft.format !== "dabao" ? (
-            <div className="editNote">Only shown for Dabao.</div>
-          ) : (
-            <div className="editOptions">
-              {vesselQuestion.options.map((o) => (
-                <button
-                  key={o.value}
-                  type="button"
-                  className={`optionCard ${draft.vessel === o.value ? "isSelected" : ""}`}
-                  onClick={() => update({ ...draft, vessel: o.value })}
-                >
-                  <div className="optionLabel">{o.label}</div>
-                  <div className="optionDesc">{o.description}</div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
         <button type="button" className="primaryBtn" onClick={() => props.onUpdate(draft)}>
           Update drink
         </button>
@@ -209,11 +187,7 @@ function normalize(drink: DrinkOption): DrinkOption {
     };
   }
 
-  if (next.format === "dinein") {
-    next = { ...next, vessel: null };
-  } else {
-    next = { ...next, vessel: next.vessel ?? "cup" };
-  }
+  next = { ...next, vessel: null };
 
   if (next.quantity < 1) next.quantity = 1;
   return next;

@@ -1,7 +1,6 @@
 import * as React from "react";
 import type { Language, Order } from "../lib/types";
-import { buildMandarinSentence, buildSGSentence } from "../lib/buildOrder";
-import { getSGTGreeting } from "../lib/time";
+import { drinkPhraseSG, drinkPhraseZH } from "../lib/buildOrder";
 import { DrinkTile } from "./DrinkTile";
 import { PaymentTile } from "./PaymentTile";
 
@@ -13,13 +12,10 @@ export function OrderPlayback(props: {
   const [lang, setLang] = React.useState<Language>("sg");
   const [isSpeaking, setIsSpeaking] = React.useState(false);
 
-  const greeting = getSGTGreeting(lang);
-
-  async function speak() {
+  async function speakText(text: string) {
     if (isSpeaking) return;
     setIsSpeaking(true);
     try {
-      const text = lang === "zh" ? buildMandarinSentence(props.order) : buildSGSentence(props.order);
       const res = await fetch("/api/speak", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -35,7 +31,6 @@ export function OrderPlayback(props: {
       await audio.play();
     } catch {
       try {
-        const text = lang === "zh" ? buildMandarinSentence(props.order) : buildSGSentence(props.order);
         const u = new SpeechSynthesisUtterance(text);
         u.lang = lang === "zh" ? "zh-CN" : "en-SG";
         window.speechSynthesis.cancel();
@@ -51,7 +46,17 @@ export function OrderPlayback(props: {
   return (
     <div className="playback">
       <div className="playbackHeader">
-        <div className="greeting">{greeting}</div>
+        <div className="playbackTopRow">
+          <button type="button" className="brandBtn" onClick={props.onStartOver}>
+            KopiOrder
+          </button>
+          <div className="pageTitleCenter">Order</div>
+          <div className="topRowSpacer" aria-hidden="true" />
+        </div>
+
+        <div className="playbackHint">
+          Select language and click on title to play your order
+        </div>
 
         <div className="toggleSticky">
           <div className="togglePills" role="tablist" aria-label="Language">
@@ -79,18 +84,19 @@ export function OrderPlayback(props: {
 
       <div className="tileStack">
         {props.order.drinks.map((drink, idx) => (
-          <DrinkTile key={idx} drink={drink} lang={lang} onEdit={() => props.onEditDrink(idx)} />
+          <DrinkTile
+            key={idx}
+            drink={drink}
+            lang={lang}
+            onEdit={() => props.onEditDrink(idx)}
+            onTitleClick={() => {
+              const text = lang === "zh" ? drinkPhraseZH(drink) : drinkPhraseSG(drink);
+              void speakText(text);
+            }}
+          />
         ))}
 
         <PaymentTile payment={props.order.payment} lang={lang} />
-
-        <button type="button" className="speakBtn" onClick={speak} disabled={isSpeaking}>
-          {lang === "zh" ? "🔊 说出你的订单" : "🔊 Say your order"}
-        </button>
-
-        <button type="button" className="startOver" onClick={props.onStartOver}>
-          Start Over
-        </button>
       </div>
     </div>
   );

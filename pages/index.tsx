@@ -12,7 +12,6 @@ import {
   strengthQuestion,
   sugarQuestion,
   temperatureQuestion,
-  vesselQuestion,
 } from "../lib/questions";
 import type {
   AppPhase,
@@ -25,7 +24,6 @@ import type {
   StrengthLevel,
   SugarLevel,
   Temperature,
-  Vessel,
 } from "../lib/types";
 
 type DraftDrink = {
@@ -35,7 +33,7 @@ type DraftDrink = {
   strength: StrengthLevel | null;
   temperature: Temperature | null;
   format: DrinkFormat | null;
-  vessel: Vessel | null;
+  vessel: null;
 };
 
 const EXIT_MS = 320;
@@ -62,7 +60,6 @@ function stepsForDraft(d: DraftDrink): StepKey[] {
   if (!isSpecialBase(d.base)) steps.push("strength");
   steps.push("temperature");
   steps.push("format");
-  if (d.format === "dabao") steps.push("vessel");
   return steps;
 }
 
@@ -73,7 +70,6 @@ function canFinalize(d: DraftDrink): boolean {
   if (!isSpecialBase(d.base) && !d.strength) return false;
   if (!d.temperature) return false;
   if (!d.format) return false;
-  if (d.format === "dabao" && !d.vessel) return false;
   return true;
 }
 
@@ -90,7 +86,7 @@ function finalizeDraft(d: DraftDrink): DrinkOption {
     strength: special ? null : (d.strength ?? "normal"),
     temperature: d.temperature ?? "hot",
     format: d.format ?? "dinein",
-    vessel: d.format === "dabao" ? (d.vessel ?? "cup") : null,
+    vessel: null,
     quantity: 1,
   };
 }
@@ -172,9 +168,7 @@ export default function Home() {
       if (keyToClear === "temperature") next.temperature = null;
       if (keyToClear === "format") {
         next.format = null;
-        next.vessel = null;
       }
-      if (keyToClear === "vessel") next.vessel = null;
       return next;
     });
     setStepIdx((i) => Math.max(0, i - 1));
@@ -233,10 +227,6 @@ export default function Home() {
           next.temperature = value as Temperature;
         } else if (currentKey === "format") {
           next.format = value as DrinkFormat;
-          if (next.format === "dinein") next.vessel = null;
-          if (next.format === "dabao") next.vessel = next.vessel ?? "cup";
-        } else if (currentKey === "vessel") {
-          next.vessel = value as Vessel;
         }
         if (!next.sugar) next.sugar = "normal";
         if (!next.temperature) next.temperature = "hot";
@@ -261,6 +251,7 @@ export default function Home() {
   }
 
   function startPayment() {
+    setMaxMsg(null);
     setAskingPayment(true);
     setPhase("flow");
     setStepIdx(0);
@@ -360,16 +351,6 @@ export default function Home() {
                 />
               ) : null}
 
-              {!askingPayment && currentKey === "vessel" ? (
-                <QuestionStep
-                  question={vesselQuestion.question}
-                  options={vesselQuestion.options}
-                  selected={draft.vessel}
-                  onSelect={selectInFlow}
-                  topLeft={<BackChevron onClick={handleBack} />}
-                />
-              ) : null}
-
               {askingPayment ? (
                 <QuestionStep
                   question={paymentQuestion.question}
@@ -412,7 +393,7 @@ export default function Home() {
                 </button>
 
                 <button type="button" className="primaryBtn" onClick={startPayment}>
-                  Continue to payment
+                  Payment options
                 </button>
               </div>
             </div>
