@@ -2,7 +2,7 @@ export const config = {
   runtime: "edge",
 };
 
-const SG_VOICE_ID = "FXMPPfJPpDj0GSwJ6ASO";
+const SG_VOICE_ID = "5JeodniElPwfCu77pH9H";
 const ZH_VOICE_ID = "vZZLclMx4wouUtKBRfZn";
 
 type Body = { text?: string; mode?: "sg" | "zh" };
