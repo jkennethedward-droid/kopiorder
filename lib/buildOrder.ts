@@ -124,12 +124,26 @@ export function paymentSentenceSG(payment: Order["payment"]): string {
 
 export function drinkPhraseSG(drink: DrinkOption): string {
   const qty = numberWords[drink.quantity] ?? String(drink.quantity);
-  const base = kopiNameSG(drink).toLowerCase();
+  const baseRaw = kopiNameSG(drink);
+  const base = baseRaw
+    .replace(/-C\b/g, " C")
+    .replace(/-O\b/g, " O")
+    .trim()
+    .toLowerCase();
 
   const where =
     drink.format === "dinein" ? "dine in" : "dabao";
 
-  return `${qty} ${base} ${where}`.replace(/\s+/g, " ").trim();
+  // Speak in clear blocks with short pauses.
+  // Use "pung" as a pronunciation hint for "Peng" (rhymes with "sung").
+  const baseSpoken = base.replace(/\bpeng\b/g, "pung");
+  const blocks = [
+    `${qty}`,
+    ...baseSpoken.split(/\s+/).filter(Boolean),
+    where,
+  ].filter(Boolean);
+
+  return blocks.join(" [short pause] ").replace(/\s+/g, " ").trim();
 }
 
 export function buildSGSentence(order: Order): string {
