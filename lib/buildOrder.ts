@@ -117,7 +117,7 @@ export function paymentLabelSG(payment: Order["payment"]): string {
 }
 
 export function paymentSentenceSG(payment: Order["payment"]): string {
-  if (payment === "paynow") return "PayNow ah.";
+  if (payment === "paynow") return "PayNow.";
   if (payment === "cash") return "Cash.";
   return "Card can.";
 }
@@ -135,15 +135,36 @@ export function drinkPhraseSG(drink: DrinkOption): string {
     drink.format === "dinein" ? "dine in" : "dabao";
 
   // Speak in clear blocks with short pauses.
-  // Use "pung" as a pronunciation hint for "Peng" (rhymes with "sung").
-  const baseSpoken = base.replace(/\bpeng\b/g, "pung");
-  const blocks = [
-    `${qty}`,
-    ...baseSpoken.split(/\s+/).filter(Boolean),
-    where,
-  ].filter(Boolean);
+  const tokens = [`${qty}`, ...base.split(/\s+/).filter(Boolean), ...where.split(/\s+/)].filter(Boolean);
+  const blocks = tokens.flatMap((t) => pronounceSGToken(t));
 
   return blocks.join(" [short pause] ").replace(/\s+/g, " ").trim();
+}
+
+function pronounceSGToken(token: string): string[] {
+  const t = token.toLowerCase();
+  if (t === "kopi") return ["koh-pee"];
+  if (t === "teh") return ["teh"];
+  if (t === "c") return ["see"];
+  if (t === "o") return ["oh"];
+  if (t === "siu") return ["siu"];
+  if (t === "dai") return ["die"];
+  if (t === "kosong") return ["koh-song"];
+  if (t === "gah") return ["gah"];
+  if (t === "gau") return ["gow"];
+  if (t === "poh") return ["poh"];
+  if (t === "peng") return ["pung"];
+  if (t === "dabao") return ["dah-bao"];
+  if (t === "yuan") return ["yoo-en"];
+  if (t === "yang") return ["yong"];
+  if (t === "milo") return ["my-lo"];
+  if (t === "horlicks") return ["hor-licks"];
+  if (t === "paynow") return ["pay", "now"];
+  if (t === "cash") return ["cash"];
+  if (t === "card") return ["card"];
+  if (t === "dine") return ["dine"];
+  if (t === "in") return ["in"];
+  return [token];
 }
 
 export function buildSGSentence(order: Order): string {

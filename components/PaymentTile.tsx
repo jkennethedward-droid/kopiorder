@@ -15,7 +15,7 @@ export function PaymentTile(props: {
     props.lang === "zh"
       ? ""
       : props.payment === "paynow"
-        ? " ah"
+        ? ""
         : props.payment === "card"
           ? " can"
           : "";
