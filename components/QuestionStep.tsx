@@ -16,6 +16,8 @@ export function QuestionStep<T extends string>(props: {
   topCenter?: React.ReactNode;
   topRight?: React.ReactNode;
   softQuestion?: boolean;
+  footer?: React.ReactNode;
+  orderPreview?: string | null;
 }) {
   return (
     <div className="step">
@@ -28,6 +30,11 @@ export function QuestionStep<T extends string>(props: {
       </div>
 
       <div className="stepBody">
+        {props.orderPreview ? (
+          <div className="orderPreview" aria-label="Order preview">
+            {props.orderPreview}
+          </div>
+        ) : null}
         <h1 className={`stepQuestion ${props.softQuestion ? "isSoft" : ""}`}>{props.question}</h1>
 
         <div className="optionList">
@@ -52,6 +59,8 @@ export function QuestionStep<T extends string>(props: {
             {props.inlineMessage}
           </div>
         ) : null}
+
+        {props.footer ? <div className="stepFooter">{props.footer}</div> : null}
       </div>
     </div>
   );

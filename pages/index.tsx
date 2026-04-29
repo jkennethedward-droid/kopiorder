@@ -125,6 +125,43 @@ function BrandButton(props: { onClick: () => void; center?: boolean }) {
   );
 }
 
+function draftOrderPreview(d: DraftDrink): string {
+  if (!d.base) return "";
+  const base =
+    d.base === "kopi"
+      ? "Kopi"
+      : d.base === "teh"
+        ? "Teh"
+        : d.base === "milo"
+          ? "Milo"
+          : d.base === "horlicks"
+            ? "Horlicks"
+            : "Yuan Yang";
+
+  const tokens: string[] = [base];
+  const special = d.base === "milo" || d.base === "horlicks";
+
+  if (!special && d.milk) {
+    if (d.milk === "c") tokens.push("C");
+    if (d.milk === "o") tokens.push("O");
+  }
+
+  if (d.sugar && d.sugar !== "normal") {
+    if (d.sugar === "siudai") tokens.push("Siu Dai");
+    if (d.sugar === "kosong") tokens.push("Kosong");
+    if (d.sugar === "gahdai") tokens.push("Gah Dai");
+  }
+
+  if (!special && d.strength && d.strength !== "normal") {
+    if (d.strength === "gau") tokens.push("Gau");
+    if (d.strength === "poh") tokens.push("Poh");
+  }
+
+  if (d.temperature === "peng") tokens.push("Peng");
+  if (d.format === "dabao") tokens.push("Dabao");
+  return tokens.join(" ");
+}
+
 export default function Home() {
   const [phase, setPhase] = React.useState<AppPhase>("flow");
   const [order, setOrder] = React.useState<Order>({ drinks: [], payment: "cash" });
@@ -255,6 +292,9 @@ export default function Home() {
   }
 
   function selectPayment(value: Order["payment"]) {
+    const paymentSpoken =
+      value === "paynow" ? "PayNow" : value === "cash" ? "Cash" : "Card";
+    void speakPreview(paymentSpoken);
     animateAdvance(() => {
       setOrder((o) => ({ ...o, payment: value }));
       setPhase("playback");
@@ -285,8 +325,42 @@ export default function Home() {
     setPhase("flow");
   }
 
+  const previewAudioRef = React.useRef<HTMLAudioElement | null>(null);
+  async function speakPreview(text: string) {
+    try {
+      const res = await fetch("/api/speak", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ text, mode: "sg" }),
+      });
+      if (!res.ok) throw new Error("tts_failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      if (previewAudioRef.current) {
+        previewAudioRef.current.pause();
+        previewAudioRef.current.currentTime = 0;
+      }
+      const audio = new Audio(url);
+      previewAudioRef.current = audio;
+      await audio.play();
+      audio.onended = () => URL.revokeObjectURL(url);
+      audio.onerror = () => URL.revokeObjectURL(url);
+    } catch {
+      try {
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = "en-SG";
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(u);
+      } catch {
+        // silent
+      }
+    }
+  }
+
   const screenClass =
     anim === "exit" ? "screen isExiting" : anim === "enter" ? "screen isEntering" : "screen";
+
+  const orderPreview = React.useMemo(() => draftOrderPreview(draft), [draft]);
 
   return (
     <>
@@ -298,12 +372,12 @@ export default function Home() {
       <div className="appShell">
         <div className="progressTrack">
           <div className="progressFill" style={{ width: `${progress}%` }} />
-          {phase === "flow" && !askingPayment ? (
-            <div className="progressPct" aria-hidden="true">
-              {progress}%
-            </div>
-          ) : null}
         </div>
+        {phase === "flow" && !askingPayment ? (
+          <div className="progressPctRow" aria-hidden="true">
+            {progress}%
+          </div>
+        ) : null}
 
         <div className="appFrame">
           {phase === "flow" ? (
@@ -316,6 +390,7 @@ export default function Home() {
                   onSelect={selectInFlow}
                   topCenter={<BrandButton onClick={startOver} center />}
                   softQuestion
+                  orderPreview={orderPreview}
                 />
               ) : null}
 
@@ -325,12 +400,9 @@ export default function Home() {
                   options={milkQuestion.options}
                   selected={draft.milk}
                   onSelect={selectInFlow}
-                  topLeft={
-                    <div className="topLeftRow">
-                      <BrandButton onClick={startOver} />
-                      <BackChevron onClick={handleBack} />
-                    </div>
-                  }
+                  topLeft={<BrandButton onClick={startOver} />}
+                  footer={<BackChevron onClick={handleBack} />}
+                  orderPreview={orderPreview}
                 />
               ) : null}
 
@@ -340,12 +412,9 @@ export default function Home() {
                   options={sugarQuestion.options}
                   selected={draft.sugar}
                   onSelect={selectInFlow}
-                  topLeft={
-                    <div className="topLeftRow">
-                      <BrandButton onClick={startOver} />
-                      <BackChevron onClick={handleBack} />
-                    </div>
-                  }
+                  topLeft={<BrandButton onClick={startOver} />}
+                  footer={<BackChevron onClick={handleBack} />}
+                  orderPreview={orderPreview}
                 />
               ) : null}
 
@@ -355,12 +424,9 @@ export default function Home() {
                   options={strengthQuestion.options}
                   selected={draft.strength}
                   onSelect={selectInFlow}
-                  topLeft={
-                    <div className="topLeftRow">
-                      <BrandButton onClick={startOver} />
-                      <BackChevron onClick={handleBack} />
-                    </div>
-                  }
+                  topLeft={<BrandButton onClick={startOver} />}
+                  footer={<BackChevron onClick={handleBack} />}
+                  orderPreview={orderPreview}
                 />
               ) : null}
 
@@ -370,12 +436,9 @@ export default function Home() {
                   options={temperatureQuestion.options}
                   selected={draft.temperature}
                   onSelect={selectInFlow}
-                  topLeft={
-                    <div className="topLeftRow">
-                      <BrandButton onClick={startOver} />
-                      <BackChevron onClick={handleBack} />
-                    </div>
-                  }
+                  topLeft={<BrandButton onClick={startOver} />}
+                  footer={<BackChevron onClick={handleBack} />}
+                  orderPreview={orderPreview}
                 />
               ) : null}
 
@@ -385,12 +448,9 @@ export default function Home() {
                   options={formatQuestion.options}
                   selected={draft.format}
                   onSelect={selectInFlow}
-                  topLeft={
-                    <div className="topLeftRow">
-                      <BrandButton onClick={startOver} />
-                      <BackChevron onClick={handleBack} />
-                    </div>
-                  }
+                  topLeft={<BrandButton onClick={startOver} />}
+                  footer={<BackChevron onClick={handleBack} />}
+                  orderPreview={orderPreview}
                 />
               ) : null}
 
@@ -400,12 +460,9 @@ export default function Home() {
                   options={paymentQuestion.options}
                   selected={order.payment}
                   onSelect={selectPayment}
-                  topLeft={
-                    <div className="topLeftRow">
-                      <BrandButton onClick={startOver} />
-                      <BackChevron onClick={handleBack} />
-                    </div>
-                  }
+                  topLeft={<BrandButton onClick={startOver} />}
+                  footer={<BackChevron onClick={handleBack} />}
+                  orderPreview={orderPreview}
                 />
               ) : null}
             </div>

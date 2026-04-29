@@ -61,17 +61,14 @@ button {
   transition: width 320ms ease;
 }
 
-.progressPct {
-  position: absolute;
-  right: 10px;
-  top: 0;
-  height: 5px;
-  display: flex;
-  align-items: center;
+.progressPctRow {
+  width: 100%;
+  max-width: 390px;
+  padding: 8px 14px 0;
+  text-align: right;
   font-size: 11px;
   color: rgba(242, 237, 228, 0.85);
   letter-spacing: 0.2px;
-  mix-blend-mode: normal;
 }
 
 .appFrame {
@@ -166,7 +163,22 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding-top: 34px;
+  padding-top: 18px;
+}
+
+.orderPreview {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--accent);
+  text-align: center;
+  padding: 6px 0 14px;
+  min-height: 34px;
+}
+.stepFooter {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
 }
 
 .stepQuestion {
@@ -302,6 +314,24 @@ button {
   padding: 14px 14px 14px;
 }
 
+.tile.isClickable {
+  cursor: pointer;
+  transition:
+    background 200ms ease,
+    border-color 200ms ease,
+    transform 200ms ease;
+}
+
+.tile.isClickable:active {
+  transform: scale(0.995);
+}
+
+.tile.isPlaying {
+  border-color: rgba(232, 160, 32, 0.85);
+  background: rgba(232, 160, 32, 0.05);
+  box-shadow: 0 0 0 1px rgba(232, 160, 32, 0.25);
+}
+
 .tilePayment {
   border-left: 3px solid var(--accent);
 }
@@ -377,7 +407,7 @@ button {
 .tileWave {
   position: absolute;
   bottom: 10px;
-  left: 12px;
+  right: 12px;
   display: inline-flex;
   align-items: flex-end;
   gap: 4px;
@@ -468,6 +498,7 @@ button {
   font-weight: 800;
   font-size: 22px;
   padding: 0;
+  white-space: nowrap;
 }
 
 .brandBtnCenter {
@@ -482,6 +513,19 @@ button {
   font-size: 16px;
   text-align: center;
   color: rgba(242, 237, 228, 0.9);
+}
+
+.playbackFooter {
+  padding: 10px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.broughtBy {
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .pageTitleCenter {

@@ -63,11 +63,13 @@ export function OrderPlayback(props: {
   return (
     <div className="playback">
       <div className="playbackHeader">
-        <button type="button" className="brandBtn" onClick={props.onStartOver}>
-          Kopi Order
-        </button>
-
-        <div className="sectionTitle">Order</div>
+        <div className="playbackTopRow">
+          <button type="button" className="brandBtn" onClick={props.onStartOver}>
+            Kopi Order
+          </button>
+          <div className="pageTitleCenter">Order</div>
+          <div className="topRowSpacer" aria-hidden="true" />
+        </div>
 
         <div className="playbackHint">
           Select language and click on title to play your order
@@ -105,7 +107,7 @@ export function OrderPlayback(props: {
             lang={lang}
             onEdit={() => props.onEditDrink(idx)}
             isPlaying={playingIdx === idx}
-            onTitleClick={() => {
+            onTileClick={() => {
               const text = lang === "zh" ? drinkPhraseZH(drink) : drinkPhraseSG(drink);
               void speakText(idx, text);
             }}
@@ -113,6 +115,13 @@ export function OrderPlayback(props: {
         ))}
 
         <PaymentTile payment={props.order.payment} lang={lang} />
+
+        <div className="playbackFooter">
+          <div className="broughtBy">Brought to you by Kopi Order</div>
+          <button type="button" className="startOver" onClick={props.onStartOver}>
+            Start Over
+          </button>
+        </div>
       </div>
     </div>
   );

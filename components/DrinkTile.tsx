@@ -11,28 +11,43 @@ export function DrinkTile(props: {
   showEdit?: boolean;
   onTitleClick?: () => void;
   isPlaying?: boolean;
+  onTileClick?: () => void;
 }) {
   const { title, description, formatLine } = getTileText(props.drink, props.lang);
   const qty = props.drink.quantity;
   const onQuantityChange = props.onQuantityChange;
 
   return (
-    <div className="tile">
+    <div
+      className={`tile ${props.onTileClick ? "isClickable" : ""} ${props.isPlaying ? "isPlaying" : ""}`}
+      onClick={props.onTileClick}
+      role={props.onTileClick ? "button" : undefined}
+      tabIndex={props.onTileClick ? 0 : undefined}
+      onKeyDown={
+        props.onTileClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") props.onTileClick?.();
+            }
+          : undefined
+      }
+    >
       <div className="tileQty">{qty}×</div>
 
       {props.showEdit === false ? null : (
-        <button type="button" className="tileEdit" onClick={props.onEdit} aria-label="Edit drink">
+        <button
+          type="button"
+          className="tileEdit"
+          onClick={(e) => {
+            e.stopPropagation();
+            props.onEdit();
+          }}
+          aria-label="Edit drink"
+        >
           <PencilIcon />
         </button>
       )}
 
-      {props.onTitleClick ? (
-        <button type="button" className="tileTitleBtn" onClick={props.onTitleClick}>
-          <span className="tileTitle">{title}</span>
-        </button>
-      ) : (
-        <div className="tileTitle">{title}</div>
-      )}
+      <div className="tileTitle">{title}</div>
       <div className="tileDesc">{description}</div>
       <div className="tileMeta">{formatLine}</div>
 
