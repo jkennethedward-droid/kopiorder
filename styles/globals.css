@@ -306,10 +306,12 @@ button {
 .homeTitle {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 48px;
+  font-size: clamp(40px, 10vw, 48px);
   line-height: 1.05;
   color: var(--accent);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .homeSubtitle {
