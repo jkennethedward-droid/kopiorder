@@ -138,7 +138,9 @@ export function drinkPhraseSG(drink: DrinkOption): string {
   const tokens = [`${qty}`, ...base.split(/\s+/).filter(Boolean), ...where.split(/\s+/)].filter(Boolean);
   const blocks = tokens.flatMap((t) => pronounceSGToken(t));
 
-  return blocks.join(" [short pause] ").replace(/\s+/g, " ").trim();
+  // IMPORTANT: Do not use bracketed pause tags. Some voices read them aloud.
+  // Use punctuation to encourage pauses instead.
+  return blocks.join(", ").replace(/\s+/g, " ").trim();
 }
 
 function pronounceSGToken(token: string): string[] {
