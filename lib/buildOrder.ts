@@ -107,44 +107,49 @@ export function descriptionSG(drink: DrinkOption): string {
 
 export function drinkPhraseSG(drink: DrinkOption): string {
   const qty = numberWords[drink.quantity] ?? String(drink.quantity);
-  const baseRaw = kopiNameSG(drink);
-  const base = baseRaw
-    .replace(/-C\b/g, " C")
-    .replace(/-O\b/g, " O")
-    .trim()
-    .toLowerCase();
+  const blocks: string[] = [];
 
-  // Speak in clear blocks with short pauses.
-  const tokens = [`${qty}`, ...base.split(/\s+/).filter(Boolean)].filter(Boolean);
-  const blocks = tokens.flatMap((t) => pronounceSGToken(t));
+  // Quantity as its own block
+  blocks.push(qty);
 
-  // IMPORTANT: Do not use bracketed pause tags. Some voices read them aloud.
-  // Use punctuation to encourage pauses instead.
-  return blocks.join(", ").replace(/\s+/g, " ").trim();
-}
+  // Base + milk suffix as one block (avoids choppy word-by-word commas)
+  const baseWord =
+    drink.base === "kopi"
+      ? "koh-pee"
+      : drink.base === "teh"
+        ? "teh"
+        : drink.base === "milo"
+          ? "my-lo"
+          : drink.base === "horlicks"
+            ? "hor-licks"
+            : "yoo-en yong";
 
-function pronounceSGToken(token: string): string[] {
-  const t = token.toLowerCase();
-  if (t === "kopi") return ["koh-pee"];
-  if (t === "teh") return ["teh"];
-  if (t === "c") return ["see"];
-  if (t === "o") return ["oh"];
-  if (t === "siu") return ["siu"];
-  if (t === "dai") return ["die"];
-  if (t === "kosong") return ["koh-song"];
-  if (t === "gah") return ["gah"];
-  if (t === "gau") return ["gow"];
-  if (t === "poh") return ["poh"];
-  if (t === "peng") return ["pung"];
-  if (t === "dabao") return ["dah-bao"];
-  if (t === "yuan") return ["yoo-en"];
-  if (t === "yang") return ["yong"];
-  if (t === "milo") return ["my-lo"];
-  if (t === "horlicks") return ["hor-licks"];
-  if (t === "paynow") return ["pay", "now"];
-  if (t === "cash") return ["cash"];
-  if (t === "card") return ["card"];
-  return [token];
+  const isSpecial = drink.base === "milo" || drink.base === "horlicks";
+  const milkSuffix =
+    isSpecial || !drink.milk
+      ? ""
+      : drink.milk === "c"
+        ? " see"
+        : drink.milk === "o"
+          ? " oh"
+          : "";
+
+  blocks.push((baseWord + milkSuffix).trim());
+
+  // Sugar block (only when non-normal)
+  if (drink.sugar === "siudai") blocks.push("siu die");
+  if (drink.sugar === "kosong") blocks.push("koh-song");
+  if (drink.sugar === "gahdai") blocks.push("gah die");
+
+  // Strength block (only when non-normal and applicable)
+  if (!isSpecial && drink.strength === "gau") blocks.push("gow");
+  if (!isSpecial && drink.strength === "poh") blocks.push("poh");
+
+  // Temperature block (only when peng)
+  if (drink.temperature === "peng") blocks.push("pung");
+
+  // Use a gentle pause between blocks (periods are smoother than many commas)
+  return blocks.filter(Boolean).join(". ") + ".";
 }
 
 export function buildSGSentence(order: Order): string {

@@ -41,7 +41,8 @@ export default async function handler(req: Request): Promise<Response> {
     body: JSON.stringify({
       text,
       model_id: "eleven_multilingual_v2",
-      voice_settings: { stability: 0.5, similarity_boost: 0.75, speed },
+      // Higher stability reduces variation between runs.
+      voice_settings: { stability: 0.85, similarity_boost: 0.8, speed },
     }),
   });
 

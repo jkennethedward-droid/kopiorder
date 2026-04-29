@@ -287,19 +287,19 @@ button {
 }
 
 .homeScreen {
-  height: 100%;
+  min-height: 100dvh;
   width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
   padding: 0;
 }
 
 .homeBlock {
   width: 100%;
   padding: 0 24px;
-  margin-top: 55vh;
-  transform: translateY(-50%);
+  /* Centered flex layout, shifted upward by 5vh to land at ~45% from top */
+  transform: translateY(-5vh);
 }
 
 .homeCenter {
