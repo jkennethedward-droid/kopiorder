@@ -21,6 +21,7 @@ export default function Document() {
 
         <meta name="theme-color" content="#0f0e0c" />
         <meta name="apple-mobile-web-app-title" content="KopiOrder" />
+        <link rel="icon" type="image/png" href="/favicon.png" />
         <link rel="icon" href="/favicon.ico" />
         {/* Replace /public/og-image.png with a designed image (1200x630, dark bg + amber KopiOrder text). */}
 
