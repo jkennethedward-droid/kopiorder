@@ -4,6 +4,26 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
+        <title>KopiOrder</title>
+        <meta name="description" content="Order kopi like a local." />
+
+        <meta property="og:title" content="KopiOrder" />
+        <meta property="og:description" content="Order kopi like a local." />
+        <meta property="og:image" content="/og-image.png" />
+        <meta property="og:url" content="https://kopiorder-kis6.vercel.app" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="KopiOrder" />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="KopiOrder" />
+        <meta name="twitter:description" content="Order kopi like a local." />
+        <meta name="twitter:image" content="/og-image.png" />
+
+        <meta name="theme-color" content="#0f0e0c" />
+        <meta name="apple-mobile-web-app-title" content="KopiOrder" />
+        <link rel="icon" href="/favicon.ico" />
+        {/* Replace /public/og-image.png with a designed image (1200x630, dark bg + amber KopiOrder text). */}
+
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
