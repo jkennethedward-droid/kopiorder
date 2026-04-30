@@ -66,11 +66,11 @@ export function OrderPlayback(props: {
     <div className="playback">
       <div className="playbackHeader">
         <div className="playbackTopRow">
-          <div className="pageTitleCenter">Order</div>
+          <div className="pageTitleCenter">Audio Tiles</div>
         </div>
 
         <div className="playbackHint">
-          Select language and click on title to play your order
+          Click on tile to play your order
         </div>
 
         <div className="toggleSticky">
@@ -121,7 +121,9 @@ export function OrderPlayback(props: {
         ))}
 
         <div className="playbackFooter">
-          <div className="broughtBy">Brought to you by Kopi Order</div>
+          <div className="broughtBy">
+            Brought to you by <span className="broughtBrand">kopi order</span>
+          </div>
           <button type="button" className="startOver" onClick={props.onStartOver}>
             Start Over
           </button>

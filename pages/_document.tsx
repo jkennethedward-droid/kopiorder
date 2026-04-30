@@ -1,23 +1,24 @@
 import { Html, Head, Main, NextScript } from "next/document";
 
 export default function Document() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kopiorder-kis6.vercel.app";
+  const ogImageUrl = `${siteUrl}/og-image.png`;
   return (
     <Html lang="en">
       <Head>
-        <title>KopiOrder</title>
         <meta name="description" content="Order kopi like a local." />
 
         <meta property="og:title" content="KopiOrder" />
         <meta property="og:description" content="Order kopi like a local." />
-        <meta property="og:image" content="/og-image.png" />
-        <meta property="og:url" content="https://kopiorder-kis6.vercel.app" />
+        <meta property="og:image" content={ogImageUrl} />
+        <meta property="og:url" content={siteUrl} />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="KopiOrder" />
 
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="KopiOrder" />
         <meta name="twitter:description" content="Order kopi like a local." />
-        <meta name="twitter:image" content="/og-image.png" />
+        <meta name="twitter:image" content={ogImageUrl} />
 
         <meta name="theme-color" content="#0f0e0c" />
         <meta name="apple-mobile-web-app-title" content="KopiOrder" />

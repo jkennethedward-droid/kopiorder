@@ -323,12 +323,12 @@ export default function Home() {
                 <div className="homeBlock">
                   <div className="homeCenter">
                     <div className="homeTitle">KopiOrder</div>
-                    <div className="homeSubtitle">Order kopi in 3 simple steps</div>
-                    <div className="homeHint">Pick your drink · We craft the order · Press play</div>
+                    <div className="homeSubtitle">Order kopi like a local</div>
+                    <div className="homeHint">Pick your drink · Hear your order · Play it to the stall</div>
                   </div>
 
                   <button type="button" className="primaryBtn homeCta" onClick={startFromHome}>
-                    Start my order
+                    Try Now Lah!
                   </button>
                 </div>
               </div>
@@ -431,7 +431,7 @@ export default function Home() {
                 </button>
 
                 <button type="button" className="primaryBtn" onClick={() => setPhase("playback")}>
-                  View order
+                  I am ready
                 </button>
               </div>
             </div>

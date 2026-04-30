@@ -596,6 +596,10 @@ button {
   font-size: 12px;
 }
 
+.broughtBrand {
+  color: var(--accent);
+}
+
 .pageTitleCenter {
   justify-self: center;
   font-family: var(--font-display);
