@@ -158,6 +158,21 @@ writePng({
 });
 
 writePng({
+  width: 1200,
+  height: 630,
+  outPath: path.join(process.cwd(), "public", "og-image-v4.png"),
+  paint: ({ width, height, ACCENT, setPixel }) => {
+    // Centered title only (clean share card)
+    const label = "KopiOrder";
+    const scale = 14;
+    const textW = label.length * 6 * scale;
+    const x = Math.round((width - textW) / 2);
+    const y = Math.round((height - 7 * scale) / 2);
+    drawText5x7({ setPixel, x, y, text: label, scale, color: ACCENT });
+  },
+});
+
+writePng({
   width: 512,
   height: 512,
   outPath: path.join(process.cwd(), "public", "favicon.png"),

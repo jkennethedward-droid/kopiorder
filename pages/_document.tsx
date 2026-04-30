@@ -3,7 +3,7 @@ import { Html, Head, Main, NextScript } from "next/document";
 export default function Document() {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kopiorder.vercel.app";
   // Versioned to help social scrapers (e.g. WhatsApp) refresh cached previews.
-  const ogImageUrl = `${siteUrl}/og-image-v3.png`;
+  const ogImageUrl = `${siteUrl}/og-image-v4.png`;
   return (
     <Html lang="en">
       <Head>
