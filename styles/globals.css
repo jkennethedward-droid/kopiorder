@@ -656,6 +656,7 @@ button {
   font-size: 13px;
   color: var(--muted);
   line-height: 1.35;
+  text-align: center;
 }
 
 .toggleSticky {

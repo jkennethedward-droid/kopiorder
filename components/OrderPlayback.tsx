@@ -30,6 +30,7 @@ export function OrderPlayback(props: {
       if (!res.ok) throw new Error("tts_failed");
 
       const blob = await res.blob();
+      if (blob.size === 0) throw new Error("tts_empty");
       const url = URL.createObjectURL(blob);
       if (audioRef.current) {
         audioRef.current.pause();
