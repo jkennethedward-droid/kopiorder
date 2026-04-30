@@ -2,26 +2,54 @@ import fs from "node:fs";
 import path from "node:path";
 import zlib from "node:zlib";
 
-// Generates simple PNG assets with a solid background.
-// Note: rendering text requires extra dependencies; replace `public/og-image.png`
-// with a designed version (dark bg + amber "KopiOrder") before launch.
+// Generates simple PNG assets with a solid background + accent shapes.
+// Note: rendering real text requires extra dependencies; this uses high-contrast
+// brand accents so link previews aren't a blank black card.
 
 const BG = { r: 0x0f, g: 0x0e, b: 0x0c }; // #0f0e0c
+const ACCENT = { r: 0xf2, g: 0xb7, b: 0x48 }; // warm amber
 
-function writeSolidPng({ width, height, outPath, r, g, b }) {
+function writePng({ width, height, outPath, paint }) {
   // Raw scanlines: each row = filter byte 0 + RGBRGB...
   const stride = 1 + width * 3;
   const raw = Buffer.alloc(stride * height);
-  for (let y = 0; y < height; y++) {
-    const rowStart = y * stride;
-    raw[rowStart] = 0; // filter = None
-    for (let x = 0; x < width; x++) {
-      const p = rowStart + 1 + x * 3;
-      raw[p] = r;
-      raw[p + 1] = g;
-      raw[p + 2] = b;
+  for (let y = 0; y < height; y++) raw[y * stride] = 0; // filter = None
+
+  function setPixel(x, y, r, g, b) {
+    if (x < 0 || y < 0 || x >= width || y >= height) return;
+    const p = y * stride + 1 + x * 3;
+    raw[p] = r;
+    raw[p + 1] = g;
+    raw[p + 2] = b;
+  }
+
+  function fillRect(x0, y0, w, h, { r, g, b }) {
+    const x1 = Math.min(width, x0 + w);
+    const y1 = Math.min(height, y0 + h);
+    for (let y = Math.max(0, y0); y < y1; y++) {
+      for (let x = Math.max(0, x0); x < x1; x++) setPixel(x, y, r, g, b);
     }
   }
+
+  function fillCircle(cx, cy, radius, { r, g, b }) {
+    const r2 = radius * radius;
+    const xMin = Math.max(0, Math.floor(cx - radius));
+    const xMax = Math.min(width - 1, Math.ceil(cx + radius));
+    const yMin = Math.max(0, Math.floor(cy - radius));
+    const yMax = Math.min(height - 1, Math.ceil(cy + radius));
+    for (let y = yMin; y <= yMax; y++) {
+      for (let x = xMin; x <= xMax; x++) {
+        const dx = x - cx;
+        const dy = y - cy;
+        if (dx * dx + dy * dy <= r2) setPixel(x, y, r, g, b);
+      }
+    }
+  }
+
+  // Background
+  fillRect(0, 0, width, height, BG);
+  // Custom accents per target image
+  paint({ fillRect, fillCircle, width, height, BG, ACCENT });
 
   const ihdr = Buffer.alloc(13);
   ihdr.writeUInt32BE(width, 0);
@@ -65,17 +93,37 @@ function chunk(type, data) {
   return Buffer.concat([len, typeBuf, data, crc]);
 }
 
-writeSolidPng({
+writePng({
   width: 1200,
   height: 630,
   outPath: path.join(process.cwd(), "public", "og-image.png"),
-  ...BG,
+  paint: ({ fillRect, width, height, ACCENT }) => {
+    // Top accent bar
+    fillRect(0, 0, width, 26, ACCENT);
+    // Bottom accent bar
+    fillRect(0, height - 18, width, 18, ACCENT);
+    // Left accent stripe
+    fillRect(0, 0, 14, height, ACCENT);
+    // Simple "tile" blocks (evokes the app UI)
+    const cardW = 300;
+    const cardH = 92;
+    const gap = 24;
+    const startX = 90;
+    const startY = 210;
+    for (let i = 0; i < 3; i++) {
+      fillRect(startX + i * (cardW + gap), startY, cardW, cardH, ACCENT);
+    }
+  },
 });
 
-writeSolidPng({
+writePng({
   width: 512,
   height: 512,
   outPath: path.join(process.cwd(), "public", "favicon.png"),
-  ...BG,
+  paint: ({ fillCircle, fillRect, width, height, ACCENT }) => {
+    // Simple cup-ish mark: circle + base
+    fillCircle(width / 2, height / 2 - 10, 130, ACCENT);
+    fillRect(width / 2 - 140, height / 2 + 120, 280, 40, ACCENT);
+  },
 });
 

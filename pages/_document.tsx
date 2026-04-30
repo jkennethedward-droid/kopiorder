@@ -2,7 +2,8 @@ import { Html, Head, Main, NextScript } from "next/document";
 
 export default function Document() {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kopiorder.vercel.app";
-  const ogImageUrl = `${siteUrl}/og-image.png`;
+  // Versioned to help social scrapers (e.g. WhatsApp) refresh cached previews.
+  const ogImageUrl = `${siteUrl}/og-image.png?v=2`;
   return (
     <Html lang="en">
       <Head>
@@ -11,6 +12,9 @@ export default function Document() {
         <meta property="og:title" content="KopiOrder" />
         <meta property="og:description" content="Order kopi like a local." />
         <meta property="og:image" content={ogImageUrl} />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta property="og:url" content={siteUrl} />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="KopiOrder" />
