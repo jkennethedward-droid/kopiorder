@@ -163,7 +163,7 @@ writePng({
   outPath: path.join(process.cwd(), "public", "og-image-v4.png"),
   paint: ({ width, height, ACCENT, setPixel }) => {
     // Centered title only (clean share card)
-    const label = "KopiOrder";
+    const label = "Kopi Order";
     const scale = 14;
     const textW = label.length * 6 * scale;
     const x = Math.round((width - textW) / 2);
