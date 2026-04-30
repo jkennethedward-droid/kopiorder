@@ -1,7 +1,7 @@
 import { Html, Head, Main, NextScript } from "next/document";
 
 export default function Document() {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kopiorder-kis6.vercel.app";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kopiorder.vercel.app";
   const ogImageUrl = `${siteUrl}/og-image.png`;
   return (
     <Html lang="en">
