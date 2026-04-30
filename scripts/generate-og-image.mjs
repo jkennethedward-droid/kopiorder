@@ -49,7 +49,7 @@ function writePng({ width, height, outPath, paint }) {
   // Background
   fillRect(0, 0, width, height, BG);
   // Custom accents per target image
-  paint({ fillRect, fillCircle, width, height, BG, ACCENT });
+  paint({ fillRect, fillCircle, width, height, BG, ACCENT, setPixel });
 
   const ihdr = Buffer.alloc(13);
   ihdr.writeUInt32BE(width, 0);
@@ -93,11 +93,44 @@ function chunk(type, data) {
   return Buffer.concat([len, typeBuf, data, crc]);
 }
 
+function drawText5x7({ setPixel, x, y, text, scale, color }) {
+  const FONT = {
+    A: [0b01110, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001],
+    D: [0b11110, 0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b11110],
+    E: [0b11111, 0b10000, 0b10000, 0b11110, 0b10000, 0b10000, 0b11111],
+    I: [0b11111, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b11111],
+    K: [0b10001, 0b10010, 0b10100, 0b11000, 0b10100, 0b10010, 0b10001],
+    O: [0b01110, 0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01110],
+    P: [0b11110, 0b10001, 0b10001, 0b11110, 0b10000, 0b10000, 0b10000],
+    R: [0b11110, 0b10001, 0b10001, 0b11110, 0b10100, 0b10010, 0b10001],
+    _: [0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000],
+  };
+
+  const upper = text.toUpperCase().replace(/ /g, "_");
+  let cx = x;
+  for (const ch of upper) {
+    const glyph = FONT[ch] ?? FONT["_"];
+    for (let row = 0; row < 7; row++) {
+      const bits = glyph[row];
+      for (let col = 0; col < 5; col++) {
+        const on = (bits >> (4 - col)) & 1;
+        if (!on) continue;
+        for (let sy = 0; sy < scale; sy++) {
+          for (let sx = 0; sx < scale; sx++) {
+            setPixel(cx + col * scale + sx, y + row * scale + sy, color.r, color.g, color.b);
+          }
+        }
+      }
+    }
+    cx += 6 * scale; // 5px glyph + 1px spacing
+  }
+}
+
 writePng({
   width: 1200,
   height: 630,
-  outPath: path.join(process.cwd(), "public", "og-image.png"),
-  paint: ({ fillRect, width, height, ACCENT }) => {
+  outPath: path.join(process.cwd(), "public", "og-image-v3.png"),
+  paint: ({ fillRect, width, height, ACCENT, setPixel }) => {
     // Top accent bar
     fillRect(0, 0, width, 26, ACCENT);
     // Bottom accent bar
@@ -113,6 +146,14 @@ writePng({
     for (let i = 0; i < 3; i++) {
       fillRect(startX + i * (cardW + gap), startY, cardW, cardH, ACCENT);
     }
+
+    // "KopiOrder" text in amber (5x7 bitmap, scaled)
+    const label = "KopiOrder";
+    const scale = 10;
+    const textW = label.length * 6 * scale;
+    const x = Math.round((width - textW) / 2);
+    const y = 90;
+    drawText5x7({ setPixel, x, y, text: label, scale, color: ACCENT });
   },
 });
 
